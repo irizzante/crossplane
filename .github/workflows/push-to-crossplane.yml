@@ -28,10 +28,11 @@ jobs:
           channel: master
           version: current
           command: build configuration -f crossplane/gitops --name=gitops.xpkg
-      - name: Some info
-        run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
+      - name: Get branch name
+        id: branch-name
+        uses: tj-actions/branch-names@v7
       - name: Push
         uses: crossplane-contrib/xpkg-action@1696d9091687aad2895436cb5656faa956628b0f # v0.2.0
         with:
-          command: push configuration -f crossplane/gitops/gitops.xpkg irizzant/gitops:${{ github.ref }}
+          command: push configuration -f crossplane/gitops/gitops.xpkg irizzant/gitops:${{ steps.branch-name.outputs.current_branch }}"
   
