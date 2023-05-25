@@ -31,5 +31,5 @@ jobs:
       - name: Push
         uses: crossplane-contrib/xpkg-action@1696d9091687aad2895436cb5656faa956628b0f # v0.2.0
         with:
-          command: push configuration -f crossplane/gitops/gitops.xpkg irizzant/gitops:${GITHUB_REF}
+          command: push configuration -f crossplane/gitops/gitops.xpkg irizzant/gitops:${GITHUB_REF_NAME}
   
