@@ -30,7 +30,6 @@
   // Use 'forwardPorts' to make a list of ports inside the container available locally.
   // "forwardPorts": [],
   // Use 'postCreateCommand' to run commands after the container is created.
-  "postStartCommand": "export PATH=${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
   // "postCreateCommand": "uname -a",
   // Configure tool-specific properties.
   // "customizations": {},
