@@ -3,7 +3,7 @@ kind: Configuration
 metadata:
   name: gitops
 spec:
-  package: irizzant/gitops:0.1.0
+  package: irizzant/gitops:main
   packagePullPolicy: IfNotPresent
   revisionActivationPolicy: Automatic
   revisionHistoryLimit: 1
