@@ -10,10 +10,11 @@
   "customizations": {
     "vscode": {
       "extensions": [
-        "eamodio.gitlens",
-        "esbenp.prettier-vscode",
-        "ms-azuretools.vscode-docker"
-      ]
+		"eamodio.gitlens",
+		"esbenp.prettier-vscode",
+		"ms-azuretools.vscode-docker",
+		"GitHub.vscode-pull-request-github"
+	]
     }
   },
   "features": {
