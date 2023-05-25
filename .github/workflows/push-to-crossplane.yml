@@ -1,0 +1,40 @@
+name: ci
+on:
+  push:
+    branches:
+      - '*'
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v3
+      -
+        name: Set up QEMU for demo
+        uses: docker/setup-qemu-action@v2
+      -
+        name: Set up Docker Buildx for demo
+        uses: docker/setup-buildx-action@v2
+      -
+        name: Login to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      -
+        name: Build and push
+        run: |
+          cd crossplane/gitops
+          
+      - name: Build
+        uses: crossplane-contrib/xpkg-action@1696d9091687aad2895436cb5656faa956628b0f # v0.2.0
+        with:
+          channel: master
+          version: current
+          command: build configuration -f crossplane/gitops --name=gitops.xpkg
+      - name: Push
+        uses: crossplane-contrib/xpkg-action@1696d9091687aad2895436cb5656faa956628b0f # v0.2.0
+        with:
+          command: push configuration -f crossplane/gitops/gitops.xpkg irizzant/gitops:${GITHUB_RUN_ID}
+  
