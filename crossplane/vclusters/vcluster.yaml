@@ -1,18 +1,20 @@
 apiVersion: apiextensions.crossplane.io/v1
 kind: Composition
 metadata:
-  name: xclusters.irizzant.it
+  name: xvclusters.irizzant.it
 spec:
   writeConnectionSecretsToNamespace: crossplane-system
   compositeTypeRef:
     apiVersion: irizzant.it/v1alpha1
-    kind: XCluster
+    kind: XVCluster
+
   resources:
     - name: vcluster-helm-release
       base:
         apiVersion: helm.crossplane.io/v1beta1
         kind: Release
         metadata:
+          name: #patched
           annotations:
             crossplane.io/external-name: # patched
         spec:
@@ -40,6 +42,7 @@ spec:
                 extraArgs: [] # patched
           providerConfigRef:
             name: helm-provider
+
       patches:
         - fromFieldPath: metadata.name
           toFieldPath: spec.forProvider.values.syncer.extraArgs[0]
@@ -63,6 +66,7 @@ spec:
             - type: string
               string:
                 fmt: "%s-vcluster"
+
     - name: helm-provider-vcluster
       base:
         apiVersion: helm.crossplane.io/v1beta1
@@ -73,6 +77,7 @@ spec:
             secretRef:
               namespace: dev-environments
               key: config
+
       patches:
         - fromFieldPath: metadata.name
           toFieldPath: metadata.name
@@ -86,6 +91,7 @@ spec:
                 fmt: "vc-%s"
       readinessChecks:
         - type: None      
+
     - name: wordpress-chart
       base:
         apiVersion: helm.crossplane.io/v1beta1
@@ -105,6 +111,7 @@ spec:
                 type: ClusterIP
           providerConfigRef:
             name: # patched
+
       patches:
         - fromFieldPath: metadata.name
           toFieldPath: spec.providerConfigRef.name
