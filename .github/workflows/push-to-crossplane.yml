@@ -4,6 +4,8 @@ on:
     branches:
       - '*'
 
+      
+
 jobs:
   docker:
     if: contains(github.event.pull_request.labels.*.name, 'CI') || github.ref_name == 'main'
