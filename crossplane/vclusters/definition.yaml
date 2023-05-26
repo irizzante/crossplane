@@ -1,15 +1,15 @@
 apiVersion: apiextensions.crossplane.io/v1
 kind: CompositeResourceDefinition
 metadata:
-  name: xclusters.irizzant.it
+  name: xvclusters.irizzant.it
 spec:
   group: irizzant.it
   names:
-    kind: XCluster
-    plural: xclusters
+    kind: XVCluster
+    plural: xvclusters
   claimNames:
-    kind: Cluster
-    plural: clusters
+    kind: VCluster
+    plural: vclusters
   versions:
   - name: v1alpha1
     served: true
