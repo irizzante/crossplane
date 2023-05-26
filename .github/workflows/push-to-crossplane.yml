@@ -1,13 +1,14 @@
 name: ci
 on:
   push:
-  label:
-    types:
-    - created
+    branches:
+      - '*'
+  pull_request:
+    types: [ labeled ]
 
 jobs:
   docker:
-    if: github.event.label.name == 'CI/CD' || github.ref_name == 'main'
+    if: github.event.label.name == 'CI' || github.ref_name == 'main'
     runs-on: ubuntu-latest
     steps:
       -
