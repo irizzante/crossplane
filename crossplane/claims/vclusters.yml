@@ -1,0 +1,5 @@
+apiVersion: irizzant.it/v1alpha1
+kind: VCluster
+metadata:
+  name: irizzant
+spec: {}

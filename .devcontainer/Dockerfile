@@ -1,7 +1,7 @@
 FROM mcr.microsoft.com/devcontainers/base:jammy
 
 RUN set -ex; echo 'alias k=kubectl' >> /home/vscode/.bashrc && echo 'complete -F __start_kubectl k' >> /home/vscode/.bashrc && \
-    export PATH=${KREW_ROOT:-$HOME/.krew}/bin:$PATH && \
+    echo 'export PATH=${KREW_ROOT:-$HOME/.krew}/bin:$PATH' >> /home/vscode/.bashrc && \
     curl -sL https://raw.githubusercontent.com/crossplane/crossplane/master/install.sh | sh && \
     # Move the crossplane kubectl extension to the bin
     sudo mv kubectl-crossplane /usr/local/bin

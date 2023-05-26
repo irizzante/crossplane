@@ -13,7 +13,8 @@
 		"eamodio.gitlens",
 		"esbenp.prettier-vscode",
 		"ms-azuretools.vscode-docker",
-		"GitHub.vscode-pull-request-github"
+		"GitHub.vscode-pull-request-github",
+		"github.vscode-github-actions"
 	]
     }
   },
@@ -23,14 +24,14 @@
     "ghcr.io/devcontainers-contrib/features/argo-cd:1": {},
     "ghcr.io/devcontainers-contrib/features/argo-workflows:1": {},
     "ghcr.io/devcontainers/features/docker-in-docker:2": {},
-    "ghcr.io/devcontainers-contrib/features/actions-runner:1": {}
+	"ghcr.io/devcontainers-contrib/features/actions-runner:1": {},
+	"ghcr.io/devcontainers-contrib/features/kind:1": {}
   },
   // Features to add to the dev container. More info: https://containers.dev/features.
   // "features": {},
   // Use 'forwardPorts' to make a list of ports inside the container available locally.
   // "forwardPorts": [],
   // Use 'postCreateCommand' to run commands after the container is created.
-  "postStartCommand": "export PATH=${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
   // "postCreateCommand": "uname -a",
   // Configure tool-specific properties.
   // "customizations": {},

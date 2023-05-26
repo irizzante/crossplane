@@ -21,6 +21,9 @@ spec:
           spec:
             type: object
             properties:
+              gitOpsRepo:
+                type: string
+                description: URL of the Git repo for GitOps
               providerConfigName:
                 type: object
                 properties:

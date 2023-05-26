@@ -1,0 +1,93 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  name: xvclusters.irizzant.it
+spec:
+  writeConnectionSecretsToNamespace: crossplane-system
+  compositeTypeRef:
+    apiVersion: irizzant.it/v1alpha1
+    kind: XVCluster
+
+  resources:
+    - name: vcluster-helm-release
+      base:
+        apiVersion: helm.crossplane.io/v1beta1
+        kind: Release
+        metadata:
+          name: #patched
+          annotations:
+            crossplane.io/external-name: # patched
+        spec:
+          rollbackLimit: 3
+          forProvider:
+            namespace: dev-environments
+            chart:
+              name: vcluster
+              repository: https://charts.loft.sh
+              version: "0.15.0"
+            values:
+              isolation:
+                enabled: true
+              sync:
+                nodes:
+                  enabled: true
+                  syncAllNodes: true
+                persistentvolumes:
+                  enabled: true
+                ingresses:
+                  enabled: true
+                networkpolicies:
+                  enabled: true
+              syncer:
+                extraArgs: [] # patched
+          providerConfigRef:
+            name: helm-provider
+
+      patches:
+        - fromFieldPath: metadata.name
+          toFieldPath: spec.forProvider.values.syncer.extraArgs[0]
+          transforms:
+            - type: string
+              string:
+                fmt: "--out-kube-config-server=https://%s.dev-environments.svc.cluster.local"
+        - fromFieldPath: metadata.name
+          toFieldPath: spec.forProvider.values.syncer.extraArgs[1]
+          transforms:
+            - type: string
+              string:
+                fmt: "--tls-san=%s.dev-environments.svc.cluster.local"
+        - fromFieldPath: metadata.name
+          toFieldPath: metadata.annotations[crossplane.io/external-name]
+          policy:
+            fromFieldPath: Required
+        - fromFieldPath: metadata.name
+          toFieldPath: metadata.name
+          transforms:
+            - type: string
+              string:
+                fmt: "%s-vcluster"
+
+    - name: helm-provider-vcluster
+      base:
+        apiVersion: helm.crossplane.io/v1beta1
+        kind: ProviderConfig
+        spec:
+          credentials:
+            source: Secret
+            secretRef:
+              namespace: dev-environments
+              key: config
+
+      patches:
+        - fromFieldPath: metadata.name
+          toFieldPath: metadata.name
+        # This ProviderConfig uses the above VCluster's connection secret as
+        # its credentials secret.
+        - fromFieldPath: "metadata.name"
+          toFieldPath: spec.credentials.secretRef.name
+          transforms:
+            - type: string
+              string:
+                fmt: "vc-%s"
+      readinessChecks:
+        - type: None
