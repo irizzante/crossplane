@@ -157,6 +157,8 @@ spec:
                     revision: HEAD
                     directories:
                     - path: cluster-addons/*
+                    - path: cluster-addons/exclude/*
+                      exclude: true
                 template:
                   metadata:
                     name: '{{path.basename}}'
