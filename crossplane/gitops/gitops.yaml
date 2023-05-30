@@ -24,6 +24,7 @@ spec:
         apiVersion: helm.crossplane.io/v1beta1
         kind: Release
         metadata:
+          name: #patched
           annotations:
             crossplane.io/external-name: argocd
         spec:
@@ -96,6 +97,8 @@ spec:
       base:
         apiVersion: kubernetes.crossplane.io/v1alpha1
         kind: Object
+        metadata:
+          name: #patched
         spec:
           providerConfigRef:
             name: #patched
@@ -140,54 +143,42 @@ spec:
       base:
         apiVersion: kubernetes.crossplane.io/v1alpha1
         kind: Object
+        metadata:
+          name: #patched
         spec:
           providerConfigRef:
             name: #patched
           forProvider:
             manifest:
               apiVersion: argoproj.io/v1alpha1
-              kind: ApplicationSet
+              kind: Application
               metadata:
-                name: cluster-addons
+                name: platform
                 namespace: argocd
+                finalizers:
+                  - resources-finalizer.argocd.argoproj.io
               spec:
-                generators:
-                - git:
-                    repoURL: #patched
-                    revision: HEAD
-                    directories:
-                    - path: cluster-addons/*
-                    - path: cluster-addons/exclude/*
-                      exclude: true
-                template:
-                  metadata:
-                    name: '{{path.basename}}'
-                  spec:
-                    project: platform
-                    source:
-                      repoURL: #patched
-                      targetRevision: HEAD
-                      path: '{{path}}'
-                    destination:
-                      server: https://kubernetes.default.svc
-                      namespace: '{{path.basename}}'
-                    syncPolicy:
-                      automated:
-                        selfHeal: true
-                        prune: true
-                        allowEmpty: true
-                      syncOptions:
-                      - PruneLast=true
-                      - CreateNamespace=true
-                      - ServerSideApply=true
+                project: platform
+                source:
+                  targetRevision: HEAD
+                  path: #patched
+                  repoUrl: #patched
+                destination:
+                  server: https://kubernetes.default.svc
+                  namespace: argocd
+                syncPolicy:
+                  automated:
+                    selfHeal: true
+                    prune: true
+                    allowEmpty: true
 
       patches:
       - type: PatchSet
         patchSetName: kubernetes-provider-ref
       - fromFieldPath: spec.gitOpsRepo
-        toFieldPath: spec.forProvider.manifest.spec.generators[0].git.repoURL
-      - fromFieldPath: spec.gitOpsRepo
-        toFieldPath: spec.forProvider.manifest.spec.template.spec.source.repoURL
+        toFieldPath: spec.forProvider.manifest.spec.source.repoURL
+      - fromFieldPath: spec.gitOpsPath
+        toFieldPath: spec.forProvider.manifest.spec.source.path
       - type: CombineFromComposite
         policy:
           fromFieldPath: Required
@@ -197,4 +188,4 @@ spec:
             - fromFieldPath: metadata.name
           strategy: string
           string:
-            fmt: "%s-argocd-platform-applicationset"
+            fmt: "%s-argocd-platform-application"
