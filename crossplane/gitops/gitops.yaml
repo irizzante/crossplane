@@ -155,8 +155,6 @@ spec:
               metadata:
                 name: platform
                 namespace: argocd
-                finalizers:
-                  - resources-finalizer.argocd.argoproj.io
               spec:
                 project: platform
                 source:
