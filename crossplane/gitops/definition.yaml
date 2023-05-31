@@ -40,3 +40,5 @@ spec:
                   - kubernetes
             required:
             - providerConfigName
+            - gitOpsRepo
+            - gitOpsPath

@@ -139,6 +139,10 @@ spec:
           name: #patched
         spec:
           references:
+          - dependsOn:
+              apiVersion: helm.crossplane.io/v1beta1
+              kind: Release
+              name: #patched
           # Use patchesFrom to patch field from other k8s resource to this object
           - patchesFrom:
               apiVersion: v1
@@ -158,6 +162,7 @@ spec:
                 name: gitlab-secret
                 namespace: kube-system
               type: Opaque
+      
       patches:
       - fromFieldPath: metadata.name
         toFieldPath: metadata.name
@@ -167,3 +172,72 @@ spec:
           - type: string
             string:
               fmt: "%s-kubernetes-provider"
+      - fromFieldPath: metadata.name
+        toFieldPath: spec.references[0].dependsOn.name
+        transforms:
+        - type: string
+          string:
+            fmt: "%s-vcluster"
+    
+    - name: gitops
+      base:
+        apiVersion: kubernetes.crossplane.io/v1alpha1
+        kind: Object
+        metadata:
+          name: #patched
+        spec:
+          references:
+          - dependsOn:
+              apiVersion: helm.crossplane.io/v1beta1
+              kind: Release
+              name: #patched
+          providerConfigRef:
+            name: kubernetes-provider
+          forProvider:
+            manifest:
+              apiVersion: irizzant.it/v1alpha1
+              kind: XGitOps
+              metadata:
+                name: #patched
+              spec:
+                gitOpsRepo: #patched
+                gitOpsPath: #patched
+                providerConfigName:
+                    helm: #patched
+                    kubernetes: #patched
+
+      patches:
+      - fromFieldPath: metadata.name
+        toFieldPath: metadata.name
+        transforms:
+          - type: string
+            string:
+              fmt: "%s-gitops"
+      - fromFieldPath: metadata.name
+        toFieldPath: spec.references[0].dependsOn.name
+        transforms:
+        - type: string
+          string:
+            fmt: "%s-vcluster"
+      - fromFieldPath: metadata.name
+        toFieldPath: spec.forProvider.manifest.metadata.name
+        transforms:
+          - type: string
+            string:
+              fmt: "%s-gitops"   
+      - fromFieldPath: spec.gitOpsRepo
+        toFieldPath: spec.forProvider.manifest.spec.gitOpsRepo
+      - fromFieldPath: spec.gitOpsPath
+        toFieldPath: spec.forProvider.manifest.spec.gitOpsPath
+      - fromFieldPath: metadata.name
+        toFieldPath: spec.forProvider.manifest.spec.providerConfigName.helm
+        transforms:
+          - type: string
+            string:
+              fmt: "%s-helm-provider"
+      - fromFieldPath: metadata.name
+        toFieldPath: spec.forProvider.manifest.spec.providerConfigName.kubernetes
+        transforms:
+          - type: string
+            string:
+              fmt: "%s-kubernetes-provider"      

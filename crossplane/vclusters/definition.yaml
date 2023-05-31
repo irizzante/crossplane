@@ -20,4 +20,13 @@ spec:
         properties:
           spec:
             type: object
-            properties: {}
+            properties:
+              gitOpsRepo:
+                type: string
+                description: GitOps repo URL
+              gitOpsPath:
+                type: string
+                description: GitOps repo path
+            required:
+            - gitOpsRepo
+            - gitOpsPath
