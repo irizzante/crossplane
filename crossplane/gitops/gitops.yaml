@@ -139,7 +139,7 @@ spec:
           string:
             fmt: "%s-argocd-platform-project"
 
-    - name: argocd-application-set
+    - name: argocd-platform-application
       base:
         apiVersion: kubernetes.crossplane.io/v1alpha1
         kind: Object
