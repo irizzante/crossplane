@@ -34,7 +34,7 @@ spec:
             chart:
               name: argo-cd
               repository: https://argoproj.github.io/argo-helm
-              version: 5.34.1
+              version: 5.34.6
             namespace: argocd
             values:
               configs:
@@ -112,7 +112,7 @@ spec:
               spec:
                 description: Platform team project
                 sourceRepos:
-                - #patched
+                - '*'
                 destinations:
                 - namespace: '*'
                   server: 'https://kubernetes.default.svc'
@@ -126,8 +126,6 @@ spec:
       patches:
       - type: PatchSet
         patchSetName: kubernetes-provider-ref
-      - fromFieldPath: spec.gitOpsRepo
-        toFieldPath: spec.forProvider.manifest.spec.sourceRepos[0]
       - type: CombineFromComposite
         policy:
           fromFieldPath: Required
@@ -169,7 +167,6 @@ spec:
                     selfHeal: true
                     prune: true
                     allowEmpty: true
-
       patches:
       - type: PatchSet
         patchSetName: kubernetes-provider-ref
