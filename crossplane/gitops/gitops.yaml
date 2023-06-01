@@ -42,18 +42,14 @@ spec:
                   application.resourceTrackingMethod: annotation
 
       patches:
+      - fromFieldPath: metadata.name
+        toFieldPath: metadata.name
+        transforms:
+          - type: string
+            string:
+              fmt: "%s-argocd"
       - type: PatchSet
         patchSetName: helm-provider-ref
-      - type: CombineFromComposite
-        policy:
-          fromFieldPath: Required
-        toFieldPath: metadata.name
-        combine:
-          variables:
-            - fromFieldPath: metadata.name
-          strategy: string
-          string:
-            fmt: "%s-argocd"
 
     - name: argocd-repository
       base:
@@ -78,21 +74,17 @@ spec:
                 url: #patched
 
       patches:
+      - fromFieldPath: metadata.name
+        toFieldPath: metadata.name
+        transforms:
+          - type: string
+            string:
+              fmt: "%s-argocd-repository"
       - type: PatchSet
         patchSetName: kubernetes-provider-ref
       - fromFieldPath: spec.gitOpsRepo
         toFieldPath: spec.forProvider.manifest.stringData.url
-      - type: CombineFromComposite
-        policy:
-          fromFieldPath: Required
-        toFieldPath: metadata.name
-        combine:
-          variables:
-            - fromFieldPath: metadata.name
-          strategy: string
-          string:
-            fmt: "%s-argocd-repository"
-
+      
     - name: argocd-project
       base:
         apiVersion: kubernetes.crossplane.io/v1alpha1
@@ -102,6 +94,11 @@ spec:
         spec:
           providerConfigRef:
             name: #patched
+          references:
+          - dependsOn:
+              apiVersion: helm.crossplane.io/v1beta1
+              kind: Release
+              name: #patched
           forProvider:
             manifest:
               apiVersion: argoproj.io/v1alpha1
@@ -124,18 +121,20 @@ spec:
                   kind: '*'
 
       patches:
+      - fromFieldPath: metadata.name
+        toFieldPath: metadata.name
+        transforms:
+          - type: string
+            string:
+              fmt: "%s-argocd-platform-project"
       - type: PatchSet
         patchSetName: kubernetes-provider-ref
-      - type: CombineFromComposite
-        policy:
-          fromFieldPath: Required
-        toFieldPath: metadata.name
-        combine:
-          variables:
-            - fromFieldPath: metadata.name
-          strategy: string
-          string:
-            fmt: "%s-argocd-platform-project"
+      - fromFieldPath: metadata.name
+        toFieldPath: spec.references[0].dependsOn.name
+        transforms:
+          - type: string
+            string:
+              fmt: "%s-argocd"
 
     - name: argocd-platform-application
       base:
@@ -146,6 +145,11 @@ spec:
         spec:
           providerConfigRef:
             name: #patched
+          references:
+          - dependsOn:
+              apiVersion: helm.crossplane.io/v1beta1
+              kind: Release
+              name: #patched
           forProvider:
             manifest:
               apiVersion: argoproj.io/v1alpha1
@@ -168,19 +172,22 @@ spec:
                     prune: true
                     allowEmpty: true
       patches:
+      - fromFieldPath: metadata.name
+        toFieldPath: metadata.name
+        transforms:
+          - type: string
+            string:
+              fmt: "%s-argocd-platform-application"
       - type: PatchSet
         patchSetName: kubernetes-provider-ref
-      - fromFieldPath: spec.gitOpsRepo
-        toFieldPath: spec.forProvider.manifest.spec.source.repoURL
+      - fromFieldPath: metadata.name
+        toFieldPath: spec.references[0].dependsOn.name
+        transforms:
+          - type: string
+            string:
+              fmt: "%s-argocd"
       - fromFieldPath: spec.gitOpsPath
         toFieldPath: spec.forProvider.manifest.spec.source.path
-      - type: CombineFromComposite
-        policy:
-          fromFieldPath: Required
-        toFieldPath: metadata.name
-        combine:
-          variables:
-            - fromFieldPath: metadata.name
-          strategy: string
-          string:
-            fmt: "%s-argocd-platform-application"
+      - fromFieldPath: spec.gitOpsRepo
+        toFieldPath: spec.forProvider.manifest.spec.source.repoURL
+      
