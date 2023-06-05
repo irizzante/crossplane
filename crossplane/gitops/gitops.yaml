@@ -107,8 +107,8 @@ spec:
             name: #patched
           references:
           - dependsOn:
-              apiVersion: helm.crossplane.io/v1beta1
-              kind: Release
+              apiVersion: kubernetes.crossplane.io/v1alpha1
+              kind: Object
               name: #patched
           forProvider:
             manifest:
@@ -145,7 +145,7 @@ spec:
         transforms:
           - type: string
             string:
-              fmt: "%s-argocd"
+              fmt: "%s-argocd-repository"
 
     - name: argocd-platform-application
       base:
