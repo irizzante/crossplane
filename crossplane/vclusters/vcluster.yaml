@@ -44,23 +44,23 @@ spec:
             name: helm-provider
 
       patches:
-        - fromFieldPath: metadata.name
+        - fromFieldPath: spec.id
           toFieldPath: spec.forProvider.values.syncer.extraArgs[0]
           transforms:
             - type: string
               string:
                 fmt: "--out-kube-config-server=https://%s.dev-environments.svc.cluster.local"
-        - fromFieldPath: metadata.name
+        - fromFieldPath: spec.id
           toFieldPath: spec.forProvider.values.syncer.extraArgs[1]
           transforms:
             - type: string
               string:
                 fmt: "--tls-san=%s.dev-environments.svc.cluster.local"
-        - fromFieldPath: metadata.name
+        - fromFieldPath: spec.id
           toFieldPath: metadata.annotations[crossplane.io/external-name]
           policy:
             fromFieldPath: Required
-        - fromFieldPath: metadata.name
+        - fromFieldPath: spec.id
           toFieldPath: metadata.name
           transforms:
             - type: string
@@ -82,7 +82,7 @@ spec:
               name: #patched
 
       patches:
-        - fromFieldPath: metadata.name
+        - fromFieldPath: spec.id
           toFieldPath: metadata.name
           transforms:
             - type: string
@@ -90,7 +90,7 @@ spec:
                 fmt: "%s-helm-provider"
         # This ProviderConfig uses the above VCluster's connection secret as
         # its credentials secret.
-        - fromFieldPath: "metadata.name"
+        - fromFieldPath: spec.id
           toFieldPath: spec.credentials.secretRef.name
           transforms:
             - type: string
@@ -114,7 +114,7 @@ spec:
               name: #patched
 
       patches:
-        - fromFieldPath: metadata.name
+        - fromFieldPath: spec.id
           toFieldPath: metadata.name
           transforms:
             - type: string
@@ -122,7 +122,7 @@ spec:
                 fmt: "%s-kubernetes-provider"
         # This ProviderConfig uses the above VCluster's connection secret as
         # its credentials secret.
-        - fromFieldPath: "metadata.name"
+        - fromFieldPath: spec.id
           toFieldPath: spec.credentials.secretRef.name
           transforms:
             - type: string
@@ -131,7 +131,7 @@ spec:
       readinessChecks:
         - type: None
     
-    - name: secret-store
+    - name: secret-for-secret-store
       base:
         apiVersion: kubernetes.crossplane.io/v1alpha1
         kind: Object
@@ -164,15 +164,19 @@ spec:
               type: Opaque
       
       patches:
-      - fromFieldPath: metadata.name
+      - fromFieldPath: spec.id
         toFieldPath: metadata.name
-      - fromFieldPath: metadata.name
+        transforms:
+        - type: string
+          string:
+            fmt: "%s-secret-store-secret"
+      - fromFieldPath: spec.id
         toFieldPath: spec.providerConfigRef.name
         transforms:
           - type: string
             string:
               fmt: "%s-kubernetes-provider"
-      - fromFieldPath: metadata.name
+      - fromFieldPath: spec.id
         toFieldPath: spec.references[0].dependsOn.name
         transforms:
         - type: string
@@ -207,19 +211,19 @@ spec:
                     kubernetes: #patched
 
       patches:
-      - fromFieldPath: metadata.name
+      - fromFieldPath: spec.id
         toFieldPath: metadata.name
         transforms:
           - type: string
             string:
               fmt: "%s-gitops"
-      - fromFieldPath: metadata.name
+      - fromFieldPath: spec.id
         toFieldPath: spec.references[0].dependsOn.name
         transforms:
         - type: string
           string:
             fmt: "%s-vcluster"
-      - fromFieldPath: metadata.name
+      - fromFieldPath: spec.id
         toFieldPath: spec.forProvider.manifest.metadata.name
         transforms:
           - type: string
@@ -229,13 +233,13 @@ spec:
         toFieldPath: spec.forProvider.manifest.spec.gitOpsRepo
       - fromFieldPath: spec.gitOpsPath
         toFieldPath: spec.forProvider.manifest.spec.gitOpsPath
-      - fromFieldPath: metadata.name
+      - fromFieldPath: spec.id
         toFieldPath: spec.forProvider.manifest.spec.providerConfigName.helm
         transforms:
           - type: string
             string:
               fmt: "%s-helm-provider"
-      - fromFieldPath: metadata.name
+      - fromFieldPath: spec.id
         toFieldPath: spec.forProvider.manifest.spec.providerConfigName.kubernetes
         transforms:
           - type: string

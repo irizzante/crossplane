@@ -21,6 +21,9 @@ spec:
           spec:
             type: object
             properties:
+              id:
+                type: string
+                description: ID of this VCluster, used as reference by other objects
               gitOpsRepo:
                 type: string
                 description: GitOps repo URL
@@ -28,5 +31,6 @@ spec:
                 type: string
                 description: GitOps repo path
             required:
+            - id
             - gitOpsRepo
             - gitOpsPath
