@@ -45,6 +45,16 @@ spec:
 
       patches:
         - fromFieldPath: spec.id
+          toFieldPath: metadata.name
+          transforms:
+            - type: string
+              string:
+                fmt: "%s-vcluster"
+        - fromFieldPath: spec.id
+          toFieldPath: metadata.annotations[crossplane.io/external-name]
+          policy:
+            fromFieldPath: Required
+        - fromFieldPath: spec.id
           toFieldPath: spec.forProvider.values.syncer.extraArgs[0]
           transforms:
             - type: string
@@ -56,16 +66,6 @@ spec:
             - type: string
               string:
                 fmt: "--tls-san=%s.dev-environments.svc.cluster.local"
-        - fromFieldPath: spec.id
-          toFieldPath: metadata.annotations[crossplane.io/external-name]
-          policy:
-            fromFieldPath: Required
-        - fromFieldPath: spec.id
-          toFieldPath: metadata.name
-          transforms:
-            - type: string
-              string:
-                fmt: "%s-vcluster"
 
     - name: helm-provider-vcluster
       base:
@@ -171,77 +171,14 @@ spec:
           string:
             fmt: "%s-secret-store-secret"
       - fromFieldPath: spec.id
+        toFieldPath: spec.references[0].dependsOn.name
+        transforms:
+        - type: string
+          string:
+            fmt: "%s-vcluster"
+      - fromFieldPath: spec.id
         toFieldPath: spec.providerConfigRef.name
         transforms:
           - type: string
             string:
               fmt: "%s-kubernetes-provider"
-      - fromFieldPath: spec.id
-        toFieldPath: spec.references[0].dependsOn.name
-        transforms:
-        - type: string
-          string:
-            fmt: "%s-vcluster"
-    
-    - name: gitops
-      base:
-        apiVersion: kubernetes.crossplane.io/v1alpha1
-        kind: Object
-        metadata:
-          name: #patched
-        spec:
-          references:
-          - dependsOn:
-              apiVersion: helm.crossplane.io/v1beta1
-              kind: Release
-              name: #patched
-          providerConfigRef:
-            name: kubernetes-provider
-          forProvider:
-            manifest:
-              apiVersion: irizzant.it/v1alpha1
-              kind: XGitOps
-              metadata:
-                name: #patched
-              spec:
-                gitOpsRepo: #patched
-                gitOpsPath: #patched
-                providerConfigName:
-                    helm: #patched
-                    kubernetes: #patched
-
-      patches:
-      - fromFieldPath: spec.id
-        toFieldPath: metadata.name
-        transforms:
-          - type: string
-            string:
-              fmt: "%s-gitops"
-      - fromFieldPath: spec.id
-        toFieldPath: spec.references[0].dependsOn.name
-        transforms:
-        - type: string
-          string:
-            fmt: "%s-vcluster"
-      - fromFieldPath: spec.id
-        toFieldPath: spec.forProvider.manifest.metadata.name
-        transforms:
-          - type: string
-            string:
-              fmt: "%s-gitops"   
-      - fromFieldPath: spec.gitOpsRepo
-        toFieldPath: spec.forProvider.manifest.spec.gitOpsRepo
-      - fromFieldPath: spec.gitOpsPath
-        toFieldPath: spec.forProvider.manifest.spec.gitOpsPath
-      - fromFieldPath: spec.id
-        toFieldPath: spec.forProvider.manifest.spec.providerConfigName.helm
-        transforms:
-          - type: string
-            string:
-              fmt: "%s-helm-provider"
-      - fromFieldPath: spec.id
-        toFieldPath: spec.forProvider.manifest.spec.providerConfigName.kubernetes
-        transforms:
-          - type: string
-            string:
-              fmt: "%s-kubernetes-provider"      
