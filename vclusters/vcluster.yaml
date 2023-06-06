@@ -19,6 +19,8 @@ spec:
             crossplane.io/external-name: # patched
         spec:
           rollbackLimit: 3
+          providerConfigRef:
+            name: helm-provider
           forProvider:
             namespace: dev-environments
             chart:
@@ -40,9 +42,7 @@ spec:
                   enabled: true
               syncer:
                 extraArgs: [] # patched
-          providerConfigRef:
-            name: helm-provider
-
+          
       patches:
         - fromFieldPath: spec.id
           toFieldPath: metadata.name
@@ -182,3 +182,66 @@ spec:
           - type: string
             string:
               fmt: "%s-kubernetes-provider"
+    
+    - name: gitops
+      base:
+        apiVersion: kubernetes.crossplane.io/v1alpha1
+        kind: Object
+        metadata:
+          name: #patched
+        spec:
+          references:
+          - dependsOn:
+              apiVersion: helm.crossplane.io/v1beta1
+              kind: Release
+              name: #patched
+          providerConfigRef:
+            name: kubernetes-provider
+          forProvider:
+            manifest:
+              apiVersion: irizzant.it/v1alpha1
+              kind: XGitOps
+              metadata:
+                name: #patched
+              spec:
+                gitOpsRepo: #patched
+                gitOpsPath: #patched
+                providerConfigName:
+                    helm: #patched
+                    kubernetes: #patched
+
+      patches:
+      - fromFieldPath: spec.id
+        toFieldPath: metadata.name
+        transforms:
+          - type: string
+            string:
+              fmt: "%s-gitops"
+      - fromFieldPath: spec.id
+        toFieldPath: spec.references[0].dependsOn.name
+        transforms:
+        - type: string
+          string:
+            fmt: "%s-vcluster"
+      - fromFieldPath: spec.id
+        toFieldPath: spec.forProvider.manifest.metadata.name
+        transforms:
+          - type: string
+            string:
+              fmt: "%s-gitops"   
+      - fromFieldPath: spec.gitOpsRepo
+        toFieldPath: spec.forProvider.manifest.spec.gitOpsRepo
+      - fromFieldPath: spec.gitOpsPath
+        toFieldPath: spec.forProvider.manifest.spec.gitOpsPath
+      - fromFieldPath: spec.id
+        toFieldPath: spec.forProvider.manifest.spec.providerConfigName.helm
+        transforms:
+          - type: string
+            string:
+              fmt: "%s-helm-provider"
+      - fromFieldPath: spec.id
+        toFieldPath: spec.forProvider.manifest.spec.providerConfigName.kubernetes
+        transforms:
+          - type: string
+            string:
+              fmt: "%s-kubernetes-provider"      
