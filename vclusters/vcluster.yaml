@@ -59,13 +59,13 @@ spec:
           transforms:
             - type: string
               string:
-                fmt: "--out-kube-config-server=https://%s.dev-environments.svc.cluster.local"
+                fmt: "--out-kube-config-server=https://%s.%s.svc.cluster.local"
         - fromFieldPath: spec.id
           toFieldPath: spec.forProvider.values.syncer.extraArgs[1]
           transforms:
             - type: string
               string:
-                fmt: "--tls-san=%s.dev-environments.svc.cluster.local"
+                fmt: "--tls-san=%s.%s.svc.cluster.local"
 
     - name: helm-provider-vcluster
       base:
