@@ -22,7 +22,7 @@ spec:
           providerConfigRef:
             name: helm-provider
           forProvider:
-            namespace: dev-environments
+            namespace: #patched
             chart:
               name: vcluster
               repository: https://charts.loft.sh
@@ -46,6 +46,12 @@ spec:
       patches:
         - fromFieldPath: spec.id
           toFieldPath: metadata.name
+          transforms:
+            - type: string
+              string:
+                fmt: "%s-vcluster"
+        - fromFieldPath: spec.id
+          toFieldPath: spec.forProvider.namespace
           transforms:
             - type: string
               string:
@@ -77,7 +83,7 @@ spec:
           credentials:
             source: Secret
             secretRef:
-              namespace: dev-environments
+              namespace: #patched
               key: config
               name: #patched
 
@@ -88,6 +94,12 @@ spec:
             - type: string
               string:
                 fmt: "%s-helm-provider"
+        - fromFieldPath: spec.id
+          toFieldPath: spec.credentials.secretRef.namespace
+          transforms:
+            - type: string
+              string:
+                fmt: "%s-vcluster"
         # This ProviderConfig uses the above VCluster's connection secret as
         # its credentials secret.
         - fromFieldPath: spec.id
@@ -109,7 +121,7 @@ spec:
           credentials:
             source: Secret
             secretRef:
-              namespace: dev-environments
+              namespace: #patched
               key: config
               name: #patched
 
@@ -120,6 +132,12 @@ spec:
             - type: string
               string:
                 fmt: "%s-kubernetes-provider"
+        - fromFieldPath: spec.id
+          toFieldPath: spec.credentials.secretRef.namespace
+          transforms:
+            - type: string
+              string:
+                fmt: "%s-vcluster"
         # This ProviderConfig uses the above VCluster's connection secret as
         # its credentials secret.
         - fromFieldPath: spec.id
