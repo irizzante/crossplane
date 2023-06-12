@@ -60,18 +60,30 @@ spec:
           toFieldPath: metadata.annotations[crossplane.io/external-name]
           policy:
             fromFieldPath: Required
-        - fromFieldPath: spec.id
+        - type: CombineFromComposite
+          policy:
+            fromFieldPath: Required
+          fromFieldPath: spec.id
           toFieldPath: spec.forProvider.values.syncer.extraArgs[0]
-          transforms:
-            - type: string
-              string:
-                fmt: "--out-kube-config-server=https://%s.%s.svc.cluster.local"
-        - fromFieldPath: spec.id
+          combine:
+            variables:
+              - fromFieldPath: spec.id
+              - fromFieldPath: spec.id
+            strategy: string
+            string:
+              fmt: "--out-kube-config-server=https://%s.%s-vcluster.svc.cluster.local"
+        - type: CombineFromComposite
+          policy:
+            fromFieldPath: Required
+          fromFieldPath: spec.id
           toFieldPath: spec.forProvider.values.syncer.extraArgs[1]
-          transforms:
-            - type: string
-              string:
-                fmt: "--tls-san=%s.%s.svc.cluster.local"
+          combine:
+            variables:
+              - fromFieldPath: spec.id
+              - fromFieldPath: spec.id
+            strategy: string
+            string:
+              fmt: "--tls-san=%s.%s-vcluster.svc.cluster.local"
 
     - name: helm-provider-vcluster
       base:
