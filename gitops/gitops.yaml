@@ -37,7 +37,47 @@ spec:
               version: 5.34.6
             namespace: argocd
             values:
+              repoServer:
+                extraContainers:
+                - name: cmp-tanka
+                  image: curlimages/curl
+                  command: ['sh', 
+                  '-c', 
+                  'curl -Lo /home/argocd/cmp-server/plugins/jb https://github.com/jsonnet-bundler/jsonnet-bundler/releases/download/v0.5.1/jb-linux-amd64 && curl -Lo /home/argocd/cmp-server/plugins/tk https://github.com/grafana/tanka/releases/download/v0.20.0/tk-linux-amd64 && chmod +x /home/argocd/cmp-server/plugins/jb && chmod +x /home/argocd/cmp-server/plugins/tk && /var/run/argocd/argocd-cmp-server']  
+                  securityContext:
+                    runAsNonRoot: true
+                    runAsUser: 999
+                  volumeMounts:
+                  - mountPath: /var/run/argocd
+                    name: var-files
+                  - mountPath: /home/argocd/cmp-server/plugins
+                    name: plugins
+                  - mountPath: /home/argocd/cmp-server/config/plugin.yaml
+                    subPath: tanka.yaml
+                    name: argocd-cmp-cm
+                  - mountPath: /tmp
+                    name: cmp-tmp
+
+                volumes:
+                - name: argocd-cmp-cm
+                  configMap:
+                    name: argocd-cmp-cm
+                - name: cmp-tmp
+                  emptyDir: {}
+
               configs:
+                cmp:
+                  create: true
+                  plugins:
+                    tanka:
+                      version: v1.0
+                      init:
+                        command: ['sh', '-c', '/home/argocd/cmp-server/plugins/jb install']
+                      generate:
+                        command:  [ 'sh', '-c', '/home/argocd/cmp-server/plugins/tk show environments/${ARGOCD_ENV_TK_ENV} --dangerous-allow-redirect']
+                      discover:
+                        fileName: "**/k.libsonnet"
+                        
                 cm:
                   application.resourceTrackingMethod: annotation
                   resource.customizations: |
@@ -57,14 +97,14 @@ spec:
                         return hs
 
       patches:
-      - fromFieldPath: metadata.name
-        toFieldPath: metadata.name
-        transforms:
-          - type: string
-            string:
-              fmt: "%s-argocd"
-      - type: PatchSet
-        patchSetName: helm-provider-ref
+        - fromFieldPath: metadata.name
+          toFieldPath: metadata.name
+          transforms:
+            - type: string
+              string:
+                fmt: "%s-argocd"
+        - type: PatchSet
+          patchSetName: helm-provider-ref
 
     - name: argocd-repository
       base:
@@ -74,10 +114,10 @@ spec:
           name: #patched
         spec:
           references:
-          - dependsOn:
-              apiVersion: helm.crossplane.io/v1beta1
-              kind: Release
-              name: #patched
+            - dependsOn:
+                apiVersion: helm.crossplane.io/v1beta1
+                kind: Release
+                name: #patched
           providerConfigRef:
             name: #patched
           forProvider:
@@ -94,23 +134,23 @@ spec:
                 url: #patched
 
       patches:
-      - fromFieldPath: metadata.name
-        toFieldPath: metadata.name
-        transforms:
-          - type: string
-            string:
-              fmt: "%s-argocd-repository"
-      - fromFieldPath: metadata.name
-        toFieldPath: spec.references[0].dependsOn.name
-        transforms:
-          - type: string
-            string:
-              fmt: "%s-argocd"
-      - type: PatchSet
-        patchSetName: kubernetes-provider-ref
-      - fromFieldPath: spec.gitOpsRepo
-        toFieldPath: spec.forProvider.manifest.stringData.url
-      
+        - fromFieldPath: metadata.name
+          toFieldPath: metadata.name
+          transforms:
+            - type: string
+              string:
+                fmt: "%s-argocd-repository"
+        - fromFieldPath: metadata.name
+          toFieldPath: spec.references[0].dependsOn.name
+          transforms:
+            - type: string
+              string:
+                fmt: "%s-argocd"
+        - type: PatchSet
+          patchSetName: kubernetes-provider-ref
+        - fromFieldPath: spec.gitOpsRepo
+          toFieldPath: spec.forProvider.manifest.stringData.url
+
     - name: argocd-project
       base:
         apiVersion: kubernetes.crossplane.io/v1alpha1
@@ -121,10 +161,10 @@ spec:
           providerConfigRef:
             name: #patched
           references:
-          - dependsOn:
-              apiVersion: kubernetes.crossplane.io/v1alpha1
-              kind: Object
-              name: #patched
+            - dependsOn:
+                apiVersion: kubernetes.crossplane.io/v1alpha1
+                kind: Object
+                name: #patched
           forProvider:
             manifest:
               apiVersion: argoproj.io/v1alpha1
@@ -135,32 +175,32 @@ spec:
               spec:
                 description: Platform team project
                 sourceRepos:
-                - '*'
+                  - "*"
                 destinations:
-                - namespace: '*'
-                  server: 'https://kubernetes.default.svc'
+                  - namespace: "*"
+                    server: "https://kubernetes.default.svc"
                 clusterResourceWhitelist:
-                - group: '*'
-                  kind: '*'
+                  - group: "*"
+                    kind: "*"
                 namespaceResourceWhitelist:
-                - group: '*'
-                  kind: '*'
+                  - group: "*"
+                    kind: "*"
 
       patches:
-      - fromFieldPath: metadata.name
-        toFieldPath: metadata.name
-        transforms:
-          - type: string
-            string:
-              fmt: "%s-argocd-platform-project"
-      - type: PatchSet
-        patchSetName: kubernetes-provider-ref
-      - fromFieldPath: metadata.name
-        toFieldPath: spec.references[0].dependsOn.name
-        transforms:
-          - type: string
-            string:
-              fmt: "%s-argocd-repository"
+        - fromFieldPath: metadata.name
+          toFieldPath: metadata.name
+          transforms:
+            - type: string
+              string:
+                fmt: "%s-argocd-platform-project"
+        - type: PatchSet
+          patchSetName: kubernetes-provider-ref
+        - fromFieldPath: metadata.name
+          toFieldPath: spec.references[0].dependsOn.name
+          transforms:
+            - type: string
+              string:
+                fmt: "%s-argocd-repository"
 
     - name: argocd-platform-application
       base:
@@ -172,10 +212,10 @@ spec:
           providerConfigRef:
             name: #patched
           references:
-          - dependsOn:
-              apiVersion: kubernetes.crossplane.io/v1alpha1
-              kind: Object
-              name: #patched
+            - dependsOn:
+                apiVersion: kubernetes.crossplane.io/v1alpha1
+                kind: Object
+                name: #patched
           forProvider:
             manifest:
               apiVersion: argoproj.io/v1alpha1
@@ -184,7 +224,7 @@ spec:
                 name: platform
                 namespace: argocd
                 finalizers:
-                - resources-finalizer.argocd.argoproj.io
+                  - resources-finalizer.argocd.argoproj.io
               spec:
                 project: platform
                 source:
@@ -200,22 +240,21 @@ spec:
                     prune: true
                     allowEmpty: true
       patches:
-      - fromFieldPath: metadata.name
-        toFieldPath: metadata.name
-        transforms:
-          - type: string
-            string:
-              fmt: "%s-argocd-platform-application"
-      - type: PatchSet
-        patchSetName: kubernetes-provider-ref
-      - fromFieldPath: metadata.name
-        toFieldPath: spec.references[0].dependsOn.name
-        transforms:
-          - type: string
-            string:
-              fmt: "%s-argocd-platform-project"
-      - fromFieldPath: spec.gitOpsPath
-        toFieldPath: spec.forProvider.manifest.spec.source.path
-      - fromFieldPath: spec.gitOpsRepo
-        toFieldPath: spec.forProvider.manifest.spec.source.repoURL
-      
+        - fromFieldPath: metadata.name
+          toFieldPath: metadata.name
+          transforms:
+            - type: string
+              string:
+                fmt: "%s-argocd-platform-application"
+        - type: PatchSet
+          patchSetName: kubernetes-provider-ref
+        - fromFieldPath: metadata.name
+          toFieldPath: spec.references[0].dependsOn.name
+          transforms:
+            - type: string
+              string:
+                fmt: "%s-argocd-platform-project"
+        - fromFieldPath: spec.gitOpsPath
+          toFieldPath: spec.forProvider.manifest.spec.source.path
+        - fromFieldPath: spec.gitOpsRepo
+          toFieldPath: spec.forProvider.manifest.spec.source.repoURL
