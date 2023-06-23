@@ -9,7 +9,11 @@ RUN set -ex; echo 'alias k=kubectl' >> /home/vscode/.bashrc && echo 'complete -F
     sudo chmod a+x /usr/local/bin/tk && \
     sudo curl -Lo /usr/local/bin/jb https://github.com/jsonnet-bundler/jsonnet-bundler/releases/latest/download/jb-linux-amd64 && \
     sudo chmod a+x /usr/local/bin/jb && \
-    sudo apt update ; sudo apt install jsonnet
+    sudo apt update ; sudo apt install jsonnet && \
+    sudo mkdir -p /etc/apt/keyrings && \
+    curl -fsSL https://repo.charm.sh/apt/gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/charm.gpg && \
+    echo "deb [signed-by=/etc/apt/keyrings/charm.gpg] https://repo.charm.sh/apt/ * *" | sudo tee /etc/apt/sources.list.d/charm.list && \
+    sudo apt update && sudo apt install gum
 
 USER vscode
 RUN cd "$(mktemp -d)" && \
