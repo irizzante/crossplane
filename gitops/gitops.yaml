@@ -43,7 +43,7 @@ spec:
                   image: curlimages/curl
                   command: ['sh', 
                   '-c', 
-                  'curl -Lo /home/argocd/cmp-server/plugins/jb https://github.com/jsonnet-bundler/jsonnet-bundler/releases/download/v0.5.1/jb-linux-amd64 && curl -Lo /home/argocd/cmp-server/plugins/tk https://github.com/grafana/tanka/releases/download/v0.20.0/tk-linux-amd64 && chmod +x /home/argocd/cmp-server/plugins/jb && chmod +x /home/argocd/cmp-server/plugins/tk && /var/run/argocd/argocd-cmp-server']  
+                  'curl -Lo /home/argocd/cmp-server/plugins/jb https://github.com/jsonnet-bundler/jsonnet-bundler/releases/download/v0.5.1/jb-linux-amd64 && curl -Lo /home/argocd/cmp-server/plugins/tk https://github.com/grafana/tanka/releases/download/v0.25.0/tk-linux-amd64 && chmod +x /home/argocd/cmp-server/plugins/jb && chmod +x /home/argocd/cmp-server/plugins/tk && /var/run/argocd/argocd-cmp-server']  
                   securityContext:
                     runAsNonRoot: true
                     runAsUser: 999
@@ -74,10 +74,10 @@ spec:
                       init:
                         command: ['sh', '-c', '/home/argocd/cmp-server/plugins/jb install']
                       generate:
-                        command:  [ 'sh', '-c', '/home/argocd/cmp-server/plugins/tk show environments/${ARGOCD_ENV_TK_ENV} --dangerous-allow-redirect']
+                        command:  [ 'sh', '-c', '/home/argocd/cmp-server/plugins/tk show environments/${ARGOCD_ENV_TK_ENV} ${ARGOCD_ENV_TK_EXTRA_ARGS} --dangerous-allow-redirect']
                       discover:
                         fileName: "**/k.libsonnet"
-                        
+
                 cm:
                   application.resourceTrackingMethod: annotation
                   resource.customizations: |
