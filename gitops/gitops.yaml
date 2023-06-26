@@ -11,13 +11,13 @@ spec:
   patchSets:
     - name: helm-provider-ref
       patches:
-      - fromFieldPath: spec.providerConfigName.helm
-        toFieldPath: spec.providerConfigRef.name
+        - fromFieldPath: spec.providerConfigName.helm
+          toFieldPath: spec.providerConfigRef.name
     - name: kubernetes-provider-ref
       patches:
-      - fromFieldPath: spec.providerConfigName.kubernetes
-        toFieldPath: spec.providerConfigRef.name
-        
+        - fromFieldPath: spec.providerConfigName.kubernetes
+          toFieldPath: spec.providerConfigRef.name
+
   resources:
     - name: argocd-chart
       base:
