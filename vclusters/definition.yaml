@@ -11,26 +11,30 @@ spec:
     kind: VCluster
     plural: vclusters
   versions:
-  - name: v1alpha1
-    served: true
-    referenceable: true
-    schema:
-      openAPIV3Schema:
-        type: object
-        properties:
-          spec:
-            type: object
-            properties:
-              id:
-                type: string
-                description: ID of this VCluster, used as reference by other objects
-              gitOpsRepo:
-                type: string
-                description: GitOps repo URL
-              gitOpsPath:
-                type: string
-                description: GitOps repo path
-            required:
-            - id
-            - gitOpsRepo
-            - gitOpsPath
+    - name: v1alpha1
+      served: true
+      referenceable: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: ID of this VCluster, used as reference by other objects
+                gitOpsRepo:
+                  type: string
+                  description: GitOps repo URL
+                gitOpsPath:
+                  type: string
+                  description: GitOps repo path
+                gitOpsSecret:
+                  type: string
+                  description: Name of the secret in the host cluster to replicate in the VCluster. Can be used to configure a ClusterStore for external-secrets
+              required:
+                - id
+                - gitOpsRepo
+                - gitOpsPath
+                - gitOpsSecret

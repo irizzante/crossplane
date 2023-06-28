@@ -177,7 +177,7 @@ spec:
           - patchesFrom:
               apiVersion: v1
               kind: Secret
-              name: gitlab-secret
+              name: #patched
               namespace: kube-system
               fieldPath: data
             toFieldPath: data
@@ -189,7 +189,7 @@ spec:
               data: #patched
               kind: Secret
               metadata:
-                name: gitlab-secret
+                name: #patched
                 namespace: kube-system
               type: Opaque
       
@@ -212,6 +212,10 @@ spec:
           - type: string
             string:
               fmt: "%s-kubernetes-provider"
+      - fromFieldPath: spec.gitOpsSecret
+        toFieldPath: spec.references[1].patchesFrom.name
+      - fromFieldPath: spec.gitOpsSecret
+        toFieldPath: spec.forProvider.manifest.metadata.name
     
     - name: gitops
       base:
