@@ -4,7 +4,7 @@ metadata:
   name: gitops
 spec:
   gitOpsRepo: https://github.com/irizzante/management-cluster.git
-  gitOpsPath: test
+  gitOpsPath: apps
   providerConfigName:
     helm: helm-provider
     kubernetes: kubernetes-provider
