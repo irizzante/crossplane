@@ -14,6 +14,12 @@ networking:
   disableDefaultCNI: true
 nodes:
 - role: control-plane
+  kubeadmConfigPatches:
+  - |
+    kind: InitConfiguration
+    nodeRegistration:
+      kubeletExtraArgs:
+        node-labels: "ingress-ready=true"
   extraPortMappings:
     - containerPort: 443
       hostPort: 443
@@ -34,7 +40,6 @@ kind: Installation
 metadata:
   name: default
 spec:
-  registry: maven-repo.sdb.it:18080
   # Configures Calico networking.
   calicoNetwork:
     # Note: The ipPools section cannot be modified post-install.
@@ -66,13 +71,13 @@ helm install crossplane \
 crossplane-stable/crossplane \
 --wait
 
-kubectl wait --for condition=ready pod --namespace crossplane-system --all
+kubectl wait --for condition=ready pod --namespace crossplane-system --all --timeout=120s
 
 kubectl apply -f https://raw.githubusercontent.com/irizzante/crossplane/main/crossplane/configurations/gitops.yaml
 
 sleep 10
 
-kubectl wait --for condition=ready pod --namespace crossplane-system --all
+kubectl wait --for condition=ready pod --namespace crossplane-system --all --timeout=120s
 
 SA=$(kubectl -n crossplane-system get sa -o name | grep provider-kubernetes | sed -e 's|serviceaccount\/|crossplane-system:|g')
 kubectl create clusterrolebinding provider-kubernetes-admin-binding --clusterrole cluster-admin --serviceaccount="${SA}"

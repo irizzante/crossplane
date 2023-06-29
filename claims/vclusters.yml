@@ -1,0 +1,8 @@
+apiVersion: irizzant.it/v1alpha1
+kind: VCluster
+metadata:
+  name: irizzant
+spec:
+  id: irizzant
+  gitOpsRepo: https://github.com/irizzante/management-cluster.git
+  gitOpsPath: management

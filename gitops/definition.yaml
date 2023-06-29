@@ -24,6 +24,9 @@ spec:
               gitOpsRepo:
                 type: string
                 description: URL of the Git repo for GitOps
+              gitOpsPath:
+                type: string
+                description: Path for GitOps
               providerConfigName:
                 type: object
                 properties:
@@ -37,3 +40,5 @@ spec:
                   - kubernetes
             required:
             - providerConfigName
+            - gitOpsRepo
+            - gitOpsPath

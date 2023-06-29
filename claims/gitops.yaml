@@ -1,0 +1,10 @@
+apiVersion: irizzant.it/v1alpha1
+kind: GitOps
+metadata:
+  name: gitops
+spec:
+  gitOpsRepo: https://github.com/irizzante/management-cluster.git
+  gitOpsPath: platform
+  providerConfigName:
+    helm: helm-provider
+    kubernetes: kubernetes-provider
