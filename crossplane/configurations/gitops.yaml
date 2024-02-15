@@ -3,7 +3,7 @@ kind: Configuration
 metadata:
   name: gitops
 spec:
-  package: irizzant/gitops:main
+  package: index.docker.io/irizzant/gitops:main
   packagePullPolicy: IfNotPresent
   revisionActivationPolicy: Automatic
   revisionHistoryLimit: 1
