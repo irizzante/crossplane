@@ -20,6 +20,8 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}          
       - name: Build
         uses: crossplane-contrib/xpkg-action@v0.2.0
+        env:
+          OS_ARCH: linux_amd64
         with:
           channel: stable
           version: current
